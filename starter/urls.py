@@ -17,22 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers, permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from apps import users
-
-schema_view = get_schema_view(
-   openapi.Info(
-      title="Starter API",
-      default_version='v1',
-      description="Starter API description",
-      contact=openapi.Contact(email="lermalizar@gmail.com"),
-      license=openapi.License(name="MIT License"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
-)
 
 # router = routers.DefaultRouter()
 # router.register(r'users', users.UserViewSet)
@@ -40,9 +26,12 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    # path('', include(router.urls)),
     path('admin/', admin.site.urls),
+    path('', include('apps.products.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('products/', include('apps.products.urls')),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    # path('api/products/', include('apps.products.urls')),
+    # Schema
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Swagger UI
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]

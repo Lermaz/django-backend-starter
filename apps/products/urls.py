@@ -1,10 +1,10 @@
 from django.urls import path
-from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
 
 urlpatterns = [
-    path('products/', views.product_list),
-    path('products/<int:pk>/', views.product_detail),
+    path('products/', views.ProductListCreate.as_view()),
+    path('products/info/', views.ProductInfoAPIView.as_view()),
+    path('products/<int:product_id>/', views.ProductDetailAPIView.as_view()),
+    path('orders/', views.OrderListAPIView.as_view()),
+    path('user-orders/', views.UserOrderListAPIView.as_view(), name='user-orders'),
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns)

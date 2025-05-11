@@ -1,23 +1,55 @@
 from rest_framework import serializers
-from .models import Product
+from .models import Product, Order, OrderItem
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'created_at', 'updated_at']
+        fields = ['name', 'description', 'price', 'stock']
 
-    def create(self, validated_data):
-        """
-        Create and return a new `Product` instance, given the validated data.
-        """
-        return Product.objects.create(**validated_data)
+    def validate_price(self, value):
+        if value <= 0:
+            raise serializers.ValidationError(
+                "Price must be greater than 0."
+            )
+        return value
+    
+class ProductInfoSerializer(serializers.Serializer):
+    products = ProductSerializer(many=True)
+    count = serializers.IntegerField()
+    max_price = serializers.FloatField()
 
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Product` instance, given the validated data.
-        """
-        instance.name = validated_data.get('name', instance.name)
-        instance.description = validated_data.get('description', instance.description)
-        instance.price = validated_data.get('price', instance.price)
-        instance.save()
-        return instance
+class OrderItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name')
+    product_price = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        source='product.price')
+
+    class Meta:
+        model = OrderItem
+        fields = (
+            'product_name',
+            'product_price',
+            'quantity',
+            'item_subtotal'
+        )
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField(method_name='total')
+
+    def total(self, obj):
+        order_items = obj.items.all()
+        return sum(order_item.item_subtotal for order_item in order_items)
+
+    class Meta:
+        model = Order
+        fields = (
+            'order_id',
+            'created_at',
+            'user',
+            'status',
+            'items',
+            'total_price',
+        )
