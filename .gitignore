@@ -8,3 +8,11 @@ wheels/
 
 # Virtual environments
 .venv
+.env
+
+# Cursor
+.cursorrules
+.cursorignore
+.cursor/
+# VSCode
+.vscode
