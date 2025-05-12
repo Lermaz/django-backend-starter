@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 from django.db import models
 from apps.users.models import User
 
@@ -50,7 +51,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
 
     @property
-    def item_subtotal(self):
+    def item_subtotal(self) -> Decimal:
         return self.product.price * self.quantity
     
     def __str__(self):

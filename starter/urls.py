@@ -17,7 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers, permissions
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from apps import users
 
 # router = routers.DefaultRouter()
@@ -29,6 +34,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.products.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # JWT
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('api/products/', include('apps.products.urls')),
     # Schema
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
